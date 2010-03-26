@@ -1,10 +1,12 @@
 <?php
 
 /**
- * Redis cache class using Rediska client
+ * sfRediskaPlugin
+ * Provides Symfony caching with Redis via Rediska (defined in factories.yml)
+ * and additionally allows a simple proxy interface to Rediska instances
  * http://rediska.geometria-lab.net
  *
- * @package    sfRedisCachePlugin
+ * @package    sfRediskaPlugin
  * @subpackage cache
  * @author     Ryan Grenz <info@ryangrenz.com>
  * @version    SVN: $Id$
