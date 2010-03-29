@@ -56,7 +56,7 @@ class Doctrine_Cache_Redis extends Doctrine_Cache_Driver
      */
     protected function _doContains($id)
     {
-        return (bool) $this->_rediska->exists($id);
+        return $this->_rediska->exists($id);
     }
 
     /**
