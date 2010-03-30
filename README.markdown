@@ -5,14 +5,15 @@ sfRediskaPlugin provides Symfony caching with Redis via Rediska (as defined in a
  
 Also, a Doctrine Redis driver is provided (also using Rediska) for query/result caching.
 
-Installation
-========
+**Installation**
 
 This plugin is currently github hosted, so if you are already using git for your project, do the following:
 
 `git submodule add git@github.com:mastermix/sfRediskaPlugin.git plugins/sfRediskaPlugin`
 
 from inside the root of your project directory.
+
+**Configuration**
 
 First of all, lets configure your Rediska instances (eg. app, otherstuff) in app.yml:
 
@@ -40,8 +41,7 @@ All configuration parameters that Rediska offers when setting up a Rediska insta
 Now we can use these instances to configure a great number of things!
 In the above example, we are going to use the 'app' instance as the storage for Symfony internal caching, and 'otherstuff' for caching other critical data.
 
-Symfony Caches
-============
+**Symfony Caches**
 Symfony provides the ability to cache critical parts of your application - session storage, routing, and the view cache.
 
 To configure sfRediskaPlugin for session storage:
@@ -67,5 +67,22 @@ For routing:
             class: sfRediskaCache
             param:
               lifetime:			86400
-              prefix:			routing
+              prefix:			routing:%SF_APP%:%SF_ENVIRONMENT%
               instance:			app      
+
+For view cache:
+
+      view_cache:
+        class: sfRediskaCache
+        param:
+          instance:			app    
+          prefix:	                view:%SF_APP%:%SF_ENVIRONMENT%
+
+**Doctrine Driver**
+
+Documentation in progress...
+
+**Links**
+Rediska - [http://rediska.geometria-lab.net/][1]
+
+  [1]: http://rediska.geometria-lab.net/
