@@ -98,10 +98,16 @@ As you can see all the Rediska commands are fully accessible this way.
 
 **Doctrine Driver**
 
-As previously mentioned, heres how to configure the Rediska Doctrine driver in your code:
+Heres how to configure the Rediska Doctrine driver in your code:
+
+    $dbCacheDriver = new Doctrine_Cache_Rediska(array('instance' => 'otherstuff', 'prefix' => 'dql'));
 
 **Links**
 
 Rediska - [http://rediska.geometria-lab.net/][1]
 
   [1]: http://rediska.geometria-lab.net/
+
+**Thanks**
+
+Some credit is due to Thomas Parisot and Benjamin Viellard for their plugin contributions too. Some code ideas from those plugins have also been ported here.
