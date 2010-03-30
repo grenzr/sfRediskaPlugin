@@ -15,6 +15,7 @@ class sfRediska {
   public static function getInstance($instance='default') 
   {
   	if (!isset(self::$instances[$instance])) {
+  		// Needed to make Rediska require paths resolve correctly:
 	  	set_include_path(get_include_path() . PATH_SEPARATOR . sfConfig::get('sf_plugins_dir').'/sfRediskaPlugin/lib/rediska/library');  
 	  	self::$instances[$instance] = new Rediska(self::getConfig($instance));
   	}

@@ -1,6 +1,0 @@
-sfRediskaPlugin
-
-sfRediskaPlugin provides Symfony caching with Redis via Rediska (as defined in app.yml and factories.yml), and additionally allows a simple proxy interface to Rediska instances.
-
-Also, a Doctrine Redis driver is provided (also using Rediska) for query/result caching.
-
