@@ -45,7 +45,7 @@ class Doctrine_Cache_Redis extends Doctrine_Cache_Driver
      */
     protected function _doFetch($id, $testCacheValidity = true)
     {
-        return $this->_rediska->get($id);
+        return ($get = $this->_rediska->get($id)) ? $get : false;
     }
 
     /**
@@ -73,7 +73,7 @@ class Doctrine_Cache_Redis extends Doctrine_Cache_Driver
     	$pipeline = $this->_rediska->pipeline();
     	$pipeline->set($id, $data);
     	if ($lifeTime) {
-    		$pipe->expire($id,$lifeTime);
+    		$pipeline->expire($id,$lifeTime);
     	}
         return $pipeline->execute();
     }
