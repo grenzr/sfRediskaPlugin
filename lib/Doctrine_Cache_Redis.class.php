@@ -73,7 +73,7 @@ class Doctrine_Cache_Redis extends Doctrine_Cache_Driver
     	$pipeline = $this->_rediska->pipeline();
     	$pipeline->set($id, $data);
     	if ($lifeTime) {
-    		$pipe->expire($id,$lifeTime);
+    		$pipe->expire($id, $lifeTime);
     	}
         return $pipeline->execute();
     }

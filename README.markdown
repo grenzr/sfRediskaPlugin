@@ -19,7 +19,7 @@ First of all, lets configure your Rediska instances (eg. app, otherstuff) in app
 
 
     all:
-      redis:
+      rediska:
 
         app:
           servers:

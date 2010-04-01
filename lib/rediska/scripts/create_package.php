@@ -2,7 +2,9 @@
 <?php
 
 // Fix warinigs
-error_reporting(error_reporting() ^ E_DEPRECATED);
+if (version_compare(PHP_VERSION, '5.3.2') >= 0) {
+    error_reporting(error_reporting() ^ E_DEPRECATED);
+}
 date_default_timezone_set('Europe/Moscow');
 
 require_once 'PEAR/PackageFileManager2.php';
@@ -32,20 +34,20 @@ $outsideDir = realpath(dirname(__FILE__) . '/../');
 $version = file_get_contents($outsideDir . '/VERSION.txt');
 
 $api_version     = $version;
-$api_state       = 'alpha';
+$api_state       = 'beta';
 
 $release_version = $version;
-$release_state   = 'alpha';
-$release_notes   = "This is an alpha release, see README.markdown for examples.";
+$release_state   = 'beta';
+$release_notes   = "This is an beta release, see README.markdown for examples.";
 
-$summary     = "A PHP API wrapper for Redis.";
+$summary     = "Rediska (radish in Russian) - PHP client for Redis.";
 
-$description = "Rediska (radish in Russian) - PHP client for Redis.
-
-Redis is an advanced fast key-value database written in C. It can be used like memcached, in front of a traditional 
+$description = "Redis is an advanced fast key-value database written in C. It can be used like memcached, in front of a traditional 
 database, or on its own thanks to the fact that the in-memory datasets are not volatile but instead persisted on disk. 
 One of the cool features is that you can store not only strings, but lists and sets with atomic operations to push/pop 
-elements.";
+elements.
+
+More information and documentation on homepage: http://rediska.geometria-lab.net";
 
 $package = new PEAR_PackageFileManager2();
 
@@ -96,6 +98,9 @@ $package->setReleaseStability($release_state);
 $package->setAPIVersion($api_version);
 $package->setAPIStability($api_state);
 
+// optional (but recommended) ZendFramework dependency
+$package->addPackageDepWithChannel('optional', 'zf', 'pear.zfcampus.org', '1.10.2', false, true);
+
 $maintainers = array(
     array(
         'name'  => 'Ivan Shumkov',
@@ -136,7 +141,11 @@ $files = array(); // classes and tests
 readDirectory($outsideDir . '/library');
 readDirectory($outsideDir . '/tests');
 
+$base = $outsideDir . '/';
+
 foreach ($files as $file) {
+
+    $file = str_replace($base, '', $file);
 
     $package->addReplacement(
         $file,
@@ -156,7 +165,6 @@ foreach ($files as $file) {
 $files = array(); // reset global
 readDirectory($outsideDir . '/library');
 
-$base = $outsideDir . '/';
 foreach ($files as $file) {
     $file = str_replace($base, '', $file);
     $package->addInstallAs($file, str_replace('library/', '', $file));

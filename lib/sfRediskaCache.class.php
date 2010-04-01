@@ -13,7 +13,12 @@
  */
 class sfRediskaCache extends sfCache
 {
-	protected $redis = null;
+	/**
+	 * Rediska instance
+	 *
+	 * @var Rediska
+	 */
+	protected $_rediska;
 
 	/**
 	 * Instantiate Rediska client and initialise it with all servers listed in the instance
@@ -27,7 +32,7 @@ class sfRediskaCache extends sfCache
 	{
 		parent::initialize($options);
 		$instance = $this->getOption('instance','default');
-		$this->redis = sfRediska::getInstance($instance);
+		$this->_rediska = sfRediska::getInstance($instance);
 	}
 
 	/**
@@ -35,7 +40,7 @@ class sfRediskaCache extends sfCache
 	 */
 	public function getBackend()
 	{
-		return $this->redis;
+		return $this->_rediska;
 	}
 
 	/**
@@ -43,7 +48,7 @@ class sfRediskaCache extends sfCache
 	 */
 	public function get($key, $default = null)
 	{
-		$value = $this->redis->get($this->getKey($key));
+		$value = $this->_rediska->get($this->getKey($key));
 		return null === $value ? $default : $value;
 	}
 
@@ -52,7 +57,7 @@ class sfRediskaCache extends sfCache
 	 */
 	public function has($key)
 	{
-		return $this->redis->exists($this->getKey($key));
+		return $this->_rediska->exists($this->getKey($key));
 	}
 
 	/**
@@ -62,23 +67,19 @@ class sfRediskaCache extends sfCache
 	{
 		$lifetime = null === $lifetime ? $this->getOption('lifetime') : $lifetime;
 
-		if ($lifetime < 1)
-		{
+		if ($lifetime < 1) {
 			$response = $this->remove($key);
-		}
-		else
-		{
-			$pipe = $this->redis->pipeline();
+		} else {
+			$pipeline = $this->_rediska->pipeline();
 
 			$origKey = $this->getKey($key);
-			$metaKey = $this->getKey($key,'lastmodified');
-			$result = $pipe
-				->set(array($origKey => $data, $metaKey => time()))
-				->expire($origKey, $lifetime)
-				->expire($metaKey, $lifetime)
-				->execute();
+			$metaKey = $this->getKey($key, 'lastmodified');
+			$result = $pipeline->set(array($origKey => $data, $metaKey => time()))
+								->expire($origKey, $lifetime)
+								->expire($metaKey, $lifetime)
+								->execute();
 
-	  $response = $result[0] && $result[1] && $result[2];
+	  		$response = $result[0] && $result[1] && $result[2];
 		}
 
 		return $response;
@@ -89,7 +90,7 @@ class sfRediskaCache extends sfCache
 	 */
 	public function remove($key)
 	{
-		return $this->redis->delete(array($this->getKey($key), $this->getKey($key, 'lastmodified')));
+		return $this->_rediska->delete(array($this->getKey($key), $this->getKey($key, 'lastmodified')));
 	}
 
 	/**
@@ -97,16 +98,15 @@ class sfRediskaCache extends sfCache
 	 */
 	public function clean($mode = sfCache::ALL)
 	{
-		if (sfCache::ALL === $mode)
-		{
-			$this->removePattern('*');
+		if (sfCache::ALL === $mode) {
+			$this->_rediska->flushDb();
 		}
 	}
 
 	public function getMany($keys)
 	{
 		$keys = array_map(array($this, 'getKey'), $keys);
-		return $this->redis->get($keys);
+		return $this->_rediska->get($keys);
 	}
 
 	/**
@@ -114,7 +114,7 @@ class sfRediskaCache extends sfCache
 	 */
 	public function getLastModified($key)
 	{
-		return $this->redis->get($this->getKey($key,'lastmodified'));
+		return $this->_rediska->get($this->getKey($key, 'lastmodified'));
 	}
 
 	/**
@@ -130,7 +130,7 @@ class sfRediskaCache extends sfCache
 	 */
 	public function getTimeout($key)
 	{
-		$ttl = $this->redis->getLifetime($this->getKey($key));
+		$ttl = $this->_rediska->getLifetime($this->getKey($key));
 		return ($ttl >= 0) ? time() + $ttl : 0;
 	}
 
@@ -143,11 +143,9 @@ class sfRediskaCache extends sfCache
 	{
 		$pattern = $this->getKey($pattern);
 		$regexp = self::patternToRegexp($pattern);
-		$keys = $this->redis->getKeysByPattern($pattern);
-		foreach ($keys as $key)
-		{
-			if (preg_match($regexp, $key))
-			{
+		$keys = $this->_rediska->getKeysByPattern($pattern);
+		foreach ($keys as $key) {
+			if (preg_match($regexp, $key)) {
 				$this->remove(substr($key, strlen($this->getOption('prefix'))));
 			}
 		}
@@ -158,7 +156,7 @@ class sfRediskaCache extends sfCache
 	 */
 	protected function getKey($key, $suffix = null) 
 	{
-		$key = $this->getOption('prefix').$key;
-		return ($suffix!==null) ? $key.self::SEPARATOR.$suffix : $key;
+		$key = $this->getOption('prefix') . $key;
+		return ($suffix !== null) ? $key . self::SEPARATOR.$suffix : $key;
 	}
 }
