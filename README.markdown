@@ -119,7 +119,8 @@ For view cache:
           instance:			app    
           prefix:	                view:%SF_APP%:%SF_ENVIRONMENT%
 
-**Rediska Commands**
+Rediska Usage
+---
 
 You may also use sfRediskaPlugin to directly use any Rediska instance.
 These are only instantiated once per page load for efficiency.
