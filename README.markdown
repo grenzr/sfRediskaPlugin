@@ -5,15 +5,52 @@ sfRediskaPlugin provides Symfony caching with Redis via Rediska (as defined in a
  
 Also, a Doctrine Redis driver is provided (also using Rediska) for query/result caching.
 
-**Installation**
+Installation
+---
 
-This plugin is currently github hosted, so if you are already using git for your project, do the following:
+There are several ways you can install the plugin:
 
-`git submodule add git@github.com:mastermix/sfRediskaPlugin.git plugins/sfRediskaPlugin`
+**Clone from git**
 
-from inside the root of your project directory.
+Clone from our plugin github repository to your Symfony project plugins directory:
 
-**Configuration**
+`git clone http://github.com/mastermix/sfRediskaPlugin.git`
+
+**Add as submodule**
+
+Add plugin github repository to you project repository as git submodule:
+
+`git submodule add http://github.com/mastermix/sfRediskaPlugin.git plugins/sfRediskaPlugin`
+
+**Export from SVN**
+
+Export from plugin SVN repository to your Symfony project plugins directory:
+
+`svn export http://svn.symfony-project.com/plugins/sfRediskaPlugin`
+
+**Add as externals**
+
+Add plugin SVN repository to you project repository as externals:
+
+`svn propset svn:externals "plugins/sfRediskaPlugin http://svn.symfony-project.com/plugins/sfRediskaPlugin" .`
+
+The SVN repository is automatically synchronised whenever a commit is made to the github repository.
+
+Enable sfRediskaPlugin
+---
+
+Don't forget to enable the plugin in your ProjectConfiguration.class.php:
+
+    class ProjectConfiguration extends sfProjectConfiguration
+    {
+      public function setup()
+      {
+        $this->enablePlugins('sfRediskaPlugin');
+      } 
+    }
+
+Configuration
+---
 
 First of all, lets configure your Rediska instances (eg. app, otherstuff) in app.yml:
 
@@ -40,9 +77,11 @@ First of all, lets configure your Rediska instances (eg. app, otherstuff) in app
 All configuration parameters that Rediska offers when setting up a Rediska instance are available here.
 
 Now we can use these instances to configure a great number of things!
-In the above example, we are going to use the 'app' instance as the storage for Symfony internal caching, and 'otherstuff' for caching other critical data.
 
-**Symfony Caches**
+In the above example, we are going to use the `app` instance as the storage for Symfony internal caching, and `otherstuff` for caching other critical data.
+
+Symfony Caches
+---
 
 Symfony provides the ability to cache critical parts of your application - session storage, routing, and the view cache.
 
@@ -96,18 +135,28 @@ Heres an example:
 
 As you can see all the Rediska commands are fully accessible this way.
 
-**Doctrine Driver**
+Doctrine Driver
+---
 
-Heres how to configure the Rediska Doctrine driver in your code:
+To setup the Rediska Doctrine driver, first you must edit your application configuration file, eg. frontendConfiguration.class.php
 
-    $dbCacheDriver = new Doctrine_Cache_Rediska(array('instance' => 'otherstuff', 'prefix' => 'dql'));
+    public function configureDoctrine(Doctrine_Manager $manager)
+    {
+        $cacheDriver = new Doctrine_Cache_Redis(array('instance' => 'otherstuff', 'prefix' => 'dql:'));
+        $manager->setAttribute(Doctrine_Core::ATTR_RESULT_CACHE, $cacheDriver);
+    } 
 
-**Links**
+**NOTE:** ProjectConfiguration.class.php  cannot be used as sfRediskaPlugin depends on configuration variables set at application level.
+
+Links
+---
 
 Rediska - [http://rediska.geometria-lab.net/][1]
 
   [1]: http://rediska.geometria-lab.net/
 
-**Thanks**
+Thanks
+---
 
-Some credit is due to Thomas Parisot and Benjamin Viellard for their plugin contributions too. Some code ideas from those plugins have also been ported here.
+Credit is due to Thomas Parisot and Benjamin Viellard for their individual plugin contributions. 
+Some implementation ideas from their plugins have also been considered when developing this plugin.
