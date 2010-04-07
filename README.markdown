@@ -127,8 +127,8 @@ These are only instantiated once per page load for efficiency.
 
 Heres an example:
 
-    $rediska = redis = sfRediska::getInstance('otherstuff');
-    $this->redis->pipeline()
+    $redis = sfRediska::getInstance('otherstuff');
+    $redis->pipeline()
       ->addToSortedSet(...)
       ->deleteFromSortedSet(..)
       ->delete(..)
