@@ -36,13 +36,15 @@ require_once 'Rediska/KeyDistributor/Interface.php';
  * 
  * @author Ivan Shumkov
  * @package Rediska
- * @version @package_version@
+ * @version 0.4.2
  * @link http://rediska.geometria-lab.net
  * @licence http://www.opensource.org/licenses/bsd-license.php
  */
 class Rediska
 {
     const EOL = "\r\n";
+
+    const STABLE_REDIS_VERSION = '1.2.6';
 
     /**
      * Default rediska instance
@@ -121,10 +123,17 @@ class Rediska
         'deletefromsortedset'        => 'Rediska_Command_DeleteFromSortedSet',
         'getsortedset'               => 'Rediska_Command_GetSortedSet',
         'incrementscoreinsortedset'  => 'Rediska_Command_IncrementScoreInSortedSet',
+        'getrankfromsortedset'       => 'Rediska_Command_GetRankFromSortedSet',
         'getfromsortedsetbyscore'    => 'Rediska_Command_GetFromSortedSetByScore',
         'deletefromsortedsetbyscore' => 'Rediska_Command_DeleteFromSortedSetByScore',
+        'deletefromsortedsetbyrank'  => 'Rediska_Command_DeleteFromSortedSetByRank',
         'getsortedsetlength'         => 'Rediska_Command_GetSortedSetLength',
         'getscorefromsortedset'      => 'Rediska_Command_GetScoreFromSortedSet',
+        'unionsortedsets'            => 'Rediska_Command_UnionSortedSets',
+        'intersectsortedsets'        => 'Rediska_Command_IntersectSortedSets',
+
+        // Sorting
+        'sort' => 'Rediska_Command_Sort',
 
         // Controls
         'save'                  => 'Rediska_Command_Save',
@@ -162,6 +171,8 @@ class Rediska
      *                  You may use basic 'crc32' (crc32(key) % servers_count) algorithm
      *                  or you personal implementation (option value - name of class
      *                  which implements Rediska_KeyDistributor_Interface).
+     * redisVersion   - Redis server version for command specification.
+     *
      * @var array
      */
     protected $_options = array(
@@ -175,7 +186,8 @@ class Rediska
         ),
         'serializer'          => 'serialize',
         'unserializer'        => 'unserialize',
-        'keydistributor'      => 'consistentHashing'
+        'keydistributor'      => 'consistentHashing',
+        'redisversion'        => self::STABLE_REDIS_VERSION,
     );
 
     /**
@@ -235,50 +247,6 @@ class Rediska
     public static function setDefaultInstace(Rediska $instance)
     {
     	self::$_defaultInstance = $instance;
-    }
-    
-    /**
-     * Add command
-     * 
-     * @param string $name      Command name
-     * @param string $className Name of class
-     */
-    public static function addCommand($name, $className)
-    {
-        if (!class_exists($className)) {
-            throw new Rediska_Exception("Class '$className' not found. You must include before or setup autoload");
-        }
-
-        // Check class
-        $classReflection = new ReflectionClass($className);
-        if (!in_array('Rediska_Command_Interface', $classReflection->getInterfaceNames())) {
-            throw new Rediska_Exception("Class '$className' must implement Rediska_Command_Interface interface");
-        }
-        $methodCreate = $classReflection->getMethod('create');
-        if (!$methodCreate || !$methodCreate->isPublic()) {
-            throw new Rediska_Exception("Class '$className' must have public method 'create'");
-        }
-
-        $lowerName = strtolower($name);
-        self::$_commands[$lowerName] = $className;
-
-        return true;
-    }
-
-    /**
-     * Remove command
-     * 
-     * @param string $name Command name
-     */
-    public static function removeCommand($name)
-    {
-        $lowerName = strtolower($name);
-        if (!isset(self::$_commands[$lowerName])) {
-            throw new Rediska_Exception("Command '$name' not found");
-        }
-        unset(self::$_commands[$lowerName]);
-
-        return true;
     }
 
     /**
@@ -391,8 +359,6 @@ class Rediska
     	$options['host'] = $host;
     	$options['port'] = $port;
 
-    	$connection = null;
-
     	$this->_connections[$connectionString] = new Rediska_Connection($options);
 
         $this->_keyDistributor->addConnection(
@@ -486,7 +452,51 @@ class Rediska
 
         return new Rediska_Pipeline($this, $this->_specifiedConnection);
     }
+    
+    /**
+     * Add command
+     * 
+     * @param string $name      Command name
+     * @param string $className Name of class
+     */
+    public static function addCommand($name, $className)
+    {
+        if (!class_exists($className)) {
+            throw new Rediska_Exception("Class '$className' not found. You must include before or setup autoload");
+        }
 
+        // Check class
+        $classReflection = new ReflectionClass($className);
+        if (!in_array('Rediska_Command_Interface', $classReflection->getInterfaceNames())) {
+            throw new Rediska_Exception("Class '$className' must implement Rediska_Command_Interface interface");
+        }
+        $methodCreate = $classReflection->getMethod('create');
+        if (!$methodCreate || !$methodCreate->isPublic()) {
+            throw new Rediska_Exception("Class '$className' must have public method 'create'");
+        }
+
+        $lowerName = strtolower($name);
+        self::$_commands[$lowerName] = $className;
+
+        return true;
+    }
+
+    /**
+     * Remove command
+     * 
+     * @param string $name Command name
+     */
+    public static function removeCommand($name)
+    {
+        $lowerName = strtolower($name);
+        if (!isset(self::$_commands[$lowerName])) {
+            throw new Rediska_Exception("Command '$name' not found");
+        }
+        unset(self::$_commands[$lowerName]);
+
+        return true;
+    }
+    
     /**
      * Get Rediska Command instance
      * 
@@ -509,6 +519,22 @@ class Rediska
 
         // Initailize command
         return new self::$_commands[$lowerName]($this, $name, $arguments);
+    }
+
+    /**
+     * Call Redis command
+     * 
+     * @param string $name Command name
+     * @param array $args  Command arguments
+     * @return mixin
+     */
+    public function __call($name, $args)
+    {
+        $this->_specifiedConnection->resetConnection();
+
+        $command = $this->getCommand($name, $args);
+        $command->write();
+        return $command->read();
     }
 
     /**
@@ -625,14 +651,5 @@ class Rediska
         } else {
             return call_user_func($this->_options['unserializer'], $value);
         }
-    }
-    
-    public function __call($name, $args)
-    {
-        $this->_specifiedConnection->resetConnection();
-
-        $command = $this->getCommand($name, $args);
-        $command->write();
-        return $command->read();
     }
 }

@@ -1,25 +1,33 @@
 <?php
 
 /**
+ * @see Rediska_Command_Response_ValueAndScore
+ */
+require_once 'Rediska/Command/Response/ValueAndScore.php';
+
+/**
  * Get members from sorted set by min and max score
  * 
  * @throws Rediska_Command_Exception
- * @param string  $name   Key name
- * @param number  $min    Min score
- * @param number  $max    Max score
- * @param integer $limit  Limit
- * @param integer $offset Offset
+ * @param string  $name       Key name
+ * @param number  $min        Min score
+ * @param number  $max        Max score
+ * @param boolean $withScores Get with scores
+ * @param integer $limit      Limit
+ * @param integer $offset     Offset
  * @return array
  * 
  * @author Ivan Shumkov
  * @package Rediska
- * @version @package_version@
+ * @version 0.4.2
  * @link http://rediska.geometria-lab.net
  * @licence http://www.opensource.org/licenses/bsd-license.php
  */
 class Rediska_Command_GetFromSortedSetByScore extends Rediska_Command_Abstract
 {
-    protected function _create($name, $min, $max, $limit = null, $offset = null)
+    protected $_version = '1.1';
+
+    protected function _create($name, $min, $max, $withScores = false, $limit = null, $offset = null)
     {
         if (!is_null($limit) && !is_integer($limit)) {
             throw new Rediska_Command_Exception("Limit must be integer");
@@ -41,16 +49,26 @@ class Rediska_Command_GetFromSortedSetByScore extends Rediska_Command_Abstract
             $command[] = $offset;
             $command[] = $limit;
         }
+        
+        if ($withScores) {
+            $this->_checkVersion('1.3.4');
+
+            $command[] = 'WITHSCORES';
+        }
 
         $this->_addCommandByConnection($connection, $command);
     }
 
-    protected function _parseResponse($response)
+    protected function _parseResponses($responses)
     {
-        $values = $response[0];
+        $values = $responses[0];
 
-        foreach($values as &$value) {
-            $value = $this->_rediska->unserialize($value);
+        if ($this->withScores) {
+            $values = Rediska_Command_Response_ValueAndScore::combine($this->_rediska, $values);
+        } else {
+            foreach($values as &$value) {
+                $value = $this->_rediska->unserialize($value);
+            }
         }
 
         return $values;

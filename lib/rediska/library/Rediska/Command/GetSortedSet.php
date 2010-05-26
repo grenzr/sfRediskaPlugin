@@ -1,44 +1,41 @@
 <?php
+
+/**
+ * @see Rediska_Command_Response_ValueAndScore
+ */
+require_once 'Rediska/Command/Response/ValueAndScore.php';
+
 /**
  * Get all the members of the Sorted Set value at key
  * 
  * @throws Rediska_Command_Exception
  * @param string  $name        Key name
  * @param integer $withScores  Return values with scores
- * @param integer $limit       Limit of elements
- * @param integer $offset      Offset (not using in sorting)
+ * @param integer $start       Start index
+ * @param integer $end         End index
  * @param boolean $revert      Revert elements (not used in sorting)
  * @return array
  * 
  * @author Ivan Shumkov
  * @package Rediska
- * @version @package_version@
+ * @version 0.4.2
  * @link http://rediska.geometria-lab.net
  * @licence http://www.opensource.org/licenses/bsd-license.php
  */
 class Rediska_Command_GetSortedSet extends Rediska_Command_Abstract
 {
-    protected function _create($name, $withScores = false, $limit = null, $offset = null, $revert = false)
+    protected $_version = '1.1';
+
+    protected function _create($name, $withScores = false, $start = 0, $end = -1, $revert = false)
     {
+        if (!is_integer($start)) {
+            throw new Rediska_Command_Exception("Start must be integer");
+        }
+        if (!is_integer($end)) {
+            throw new Rediska_Command_Exception("End must be integer");
+        }
+
         $connection = $this->_rediska->getConnectionByKeyName($name);
-
-        if (!is_null($limit) && !is_integer($limit)) {
-            throw new Rediska_Command_Exception("Limit must be integer");
-        }
-
-        if (is_null($offset)) {
-            $offset = 0;
-        } else if (!is_integer($offset)) {
-            throw new Rediska_Command_Exception("Offset must be integer");
-        }
-
-        $start = $offset;
-
-        if (is_null($limit)) {
-            $end = -1;
-        } else {
-            $end = $offset + $limit - 1;
-        }
 
         $command = array($revert ? 'ZREVRANGE' : 'ZRANGE',
                          "{$this->_rediska->getOption('namespace')}$name",
@@ -52,44 +49,18 @@ class Rediska_Command_GetSortedSet extends Rediska_Command_Abstract
         $this->_addCommandByConnection($connection, $command);
     }
 
-    protected function _parseResponse($response)
+    protected function _parseResponses($responses)
     {
-        $values = $response[0];
+        $values = $responses[0];
 
         if ($this->withScores) {
-        	$isValue = true;
-        	$valuesWithScores = array();
-            foreach($values as $valueOrScore) {
-            	if ($isValue) {
-            		$value = $this->_rediska->unserialize($valueOrScore);
-            	} else {
-            		$score = $valueOrScore;
-            		$valuesWithScores[] = new Rediska_Command_GetSortedSet_ValueAndScore(array('value' => $value, 'score' => $score));
-            	}
-
-            	$isValue = !$isValue;
-            }
-        	
-        	return $valuesWithScores;
+        	$values = Rediska_Command_Response_ValueAndScore::combine($this->_rediska, $values);
         } else {
             foreach($values as &$value) {
         	   $value = $this->_rediska->unserialize($value);
             }
-
-            return $values;	
         }
-    }
-}
 
-class Rediska_Command_GetSortedSet_ValueAndScore extends ArrayObject
-{
-    public function __set($name, $value)
-    {
-        $this[$name] = $value;
-    }
-
-    public function __get($name)
-    {
-        return $this[$name];
+        return $values;
     }
 }

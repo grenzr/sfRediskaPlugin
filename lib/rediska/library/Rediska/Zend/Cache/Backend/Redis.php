@@ -20,7 +20,7 @@ require_once 'Zend/Cache/Backend/ExtendedInterface.php';
  * 
  * @author Ivan Shumkov
  * @package Rediska
- * @version @package_version@
+ * @version 0.4.2
  * @link http://rediska.geometria-lab.net
  * @licence http://www.opensource.org/licenses/bsd-license.php
  */
@@ -120,7 +120,7 @@ class Rediska_Zend_Cache_Backend_Redis extends Zend_Cache_Backend implements Zen
 
         $result = $this->_rediska->set($id, array($data, time(), $lifetime));
 
-        if ($result) {
+        if ($result && $lifetime) {
             $this->_rediska->expire($id, $lifetime);
         }
 
@@ -171,9 +171,9 @@ class Rediska_Zend_Cache_Backend_Redis extends Zend_Cache_Backend implements Zen
             case Zend_Cache::CLEANING_MODE_MATCHING_ANY_TAG:
                 $this->_log(self::TAGS_UNSUPPORTED_BY_CLEAN_OF_REDIS_BACKEND);
                 break;
-               default:
+            default:
                 Zend_Cache::throwException('Invalid mode for clean() method');
-                   break;
+                break;
         }
     }
 

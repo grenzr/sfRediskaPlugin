@@ -10,7 +10,7 @@
  * 
  * @author Ivan Shumkov
  * @package Rediska
- * @version @package_version@
+ * @version 0.4.2
  * @link http://rediska.geometria-lab.net
  * @licence http://www.opensource.org/licenses/bsd-license.php
  */
@@ -33,8 +33,8 @@ class Rediska_Command_Increment extends Rediska_Command_Abstract
         $this->_addCommandByConnection($connection, $command);
     }
 
-    protected function _parseResponse($response)
+    protected function _parseResponses($responses)
     {
-        return $response[0];
+        return $responses[0];
     }
 }
