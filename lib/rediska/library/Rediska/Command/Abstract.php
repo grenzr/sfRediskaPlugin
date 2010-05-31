@@ -3,7 +3,7 @@
 /**
  * @see Rediska_Command_Exception
  */
-require_once 'Rediska/Command/Exception.php';
+require_once(dirname(__FILE__).'/Exception.php');
 
 /**
  * Rediska command abstract class

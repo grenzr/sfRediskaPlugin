@@ -3,7 +3,7 @@
 /**
  * @see Rediska_Command_CompareSets
  */
-require_once 'Rediska/Command/CompareSortedSets.php';
+require_once(dirname(__FILE__).'/CompareSortedSets.php');
 
 /**
  * Store to key union between the sorted sets

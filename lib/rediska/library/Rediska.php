@@ -3,32 +3,32 @@
 /**
  * @see Rediska_Exception
  */
-require_once 'Rediska/Exception.php';
+require_once(dirname(__FILE__).'/Rediska/Exception.php');
 
 /**
  * @see Rediska_Connection
  */
-require_once 'Rediska/Connection.php';
+require_once(dirname(__FILE__).'/Rediska/Connection.php');
 
 /**
  * @see Rediska_Connection_Specified
  */
-require_once 'Rediska/Connection/Specified.php';
+require_once(dirname(__FILE__).'/Rediska/Connection/Specified.php');
 
 /**
  * @see Rediska_Command_Interface
  */
-require_once 'Rediska/Command/Interface.php';
+require_once(dirname(__FILE__).'/Rediska/Command/Interface.php');
 
 /**
  * @see Rediska_Command_Abstract
  */
-require_once 'Rediska/Command/Abstract.php';
+require_once(dirname(__FILE__).'/Rediska/Command/Abstract.php');
 
 /**
  * @see Rediska_KeyDistributor_Interface
  */
-require_once 'Rediska/KeyDistributor/Interface.php';
+require_once(dirname(__FILE__).'/Rediska/KeyDistributor/Interface.php');
 
 /**
  * Rediska (radish on russian) - PHP client 
@@ -448,7 +448,7 @@ class Rediska
      */
     public function pipeline()
     {
-        require_once 'Rediska/Pipeline.php';
+        require_once(dirname(__FILE__).'/Rediska/Pipeline.php');
 
         return new Rediska_Pipeline($this, $this->_specifiedConnection);
     }
@@ -514,7 +514,7 @@ class Rediska
 
         // Load native Rediska command class
         if (strpos(self::$_commands[$lowerName], 'Rediska_Command_') === 0) {
-            require_once 'Rediska/Command/' . substr(self::$_commands[$lowerName], 16) . '.php';
+            require_once(dirname(__FILE__).'/Rediska/Command/' . substr(self::$_commands[$lowerName], 16) . '.php');
         }
 
         // Initailize command
@@ -551,7 +551,7 @@ class Rediska
             $this->_keyDistributor = $name;
         } else if (in_array($name, array('crc32', 'consistentHashing'))) {
             $name = ucfirst($name);
-            require_once "Rediska/KeyDistributor/$name.php";
+            require_once(dirname(__FILE__)."/Rediska/KeyDistributor/$name.php");
             $className = "Rediska_KeyDistributor_$name";
             $this->_keyDistributor = new $className;
         } else {

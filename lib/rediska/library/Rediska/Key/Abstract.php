@@ -3,12 +3,12 @@
 /**
  * @see Rediska
  */
-require_once 'Rediska.php';
+require_once(dirname(__FILE__).'/../../Rediska.php');
 
 /**
  * @see Rediska_Key_Exception
  */
-require_once 'Rediska/Key/Exception.php';
+require_once(dirname(__FILE__).'/Exception.php');
 
 /**
  * Rediska key abstract class

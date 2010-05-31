@@ -3,7 +3,7 @@
 /**
  * @see Rediska_Command_CompareSets
  */
-require_once 'Rediska/Command/CompareSets.php';
+require_once(dirname(__FILE__).'/CompareSets.php');
 
 /**
  * Return the intersection between the Sets stored at key1, key2, ..., keyN

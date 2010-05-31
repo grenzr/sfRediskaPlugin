@@ -3,7 +3,7 @@
 /**
  * @see Rediska_Connection_Exception
  */
-require_once 'Rediska/Connection/Exception.php';
+require_once(dirname(__FILE__).'/Connection/Exception.php');
 
 /**
  * Rediska connection

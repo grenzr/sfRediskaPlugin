@@ -3,7 +3,7 @@
 /**
  * @see Rediska_Command_CompareSets
  */
-require_once 'Rediska/Command/CompareSets.php';
+require_once(dirname(__FILE__).'/CompareSets.php');
 
 /**
  * Return the difference between the Set stored at key1 and all the Sets key2, ..., keyN

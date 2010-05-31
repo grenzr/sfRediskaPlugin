@@ -3,7 +3,7 @@
 /**
  * @see Rediska_Key_Abstract
  */
-require_once 'Rediska/Key/Abstract.php';
+require_once(dirname(__FILE__).'/Abstract.php');
 
 /**
  * Rediska Sorted set key
