@@ -11,7 +11,7 @@
  * 
  * @author Ivan Shumkov
  * @package Rediska
- * @version @package_version@
+ * @version 0.4.2
  * @link http://rediska.geometria-lab.net
  * @licence http://www.opensource.org/licenses/bsd-license.php
  */
@@ -38,10 +38,10 @@ class Rediska_Command_Rename extends Rediska_Command_Abstract
         $this->_addCommandByConnection($oldNameConnection, $command);
     }
 
-    protected function _parseResponse($response)
+    protected function _parseResponses($responses)
     {
         if (!$this->isAtomic()) {
-            $oldValue = $this->_rediska->unserialize($response[0]);
+            $oldValue = $this->_rediska->unserialize($responses[0]);
             if (!is_null($oldValue)) {
                 $reply = $this->_rediska->set($this->newName, $oldValue, $this->overwrite);
 
@@ -54,7 +54,7 @@ class Rediska_Command_Rename extends Rediska_Command_Abstract
                 throw new Rediska_Command_Exception('No such key');
             }
         } else {
-            return (boolean)$response[0];
+            return (boolean)$responses[0];
         }
     }
 }

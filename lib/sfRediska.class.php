@@ -25,7 +25,7 @@ class sfRediska {
   
   public static function getConfig($instance='default') 
   {
-  	$path = "app_rediska_$instance";
+  	$path = "app_sfRediska_$instance";
   	$config = sfConfig::get($path);
   	if (!$config) throw new sfInitializationException("No Redis config located at '$path' in app.yml");
   	return $config;

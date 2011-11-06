@@ -3,14 +3,14 @@
 /**
  * @see Rediska_Connection_Exception
  */
-require_once 'Rediska/Connection/Exception.php';
+require_once(dirname(__FILE__).'/Connection/Exception.php');
 
 /**
  * Rediska connection
  * 
  * @author Ivan Shumkov
  * @package Rediska
- * @version @package_version@
+ * @version 0.4.2
  * @link http://rediska.geometria-lab.net
  * @licence http://www.opensource.org/licenses/bsd-license.php
  */
@@ -358,7 +358,7 @@ class Rediska_Connection
             return $this->_options['host'] . ':' . $this->_options['port'];
         }
     }
-    
+
     protected function _readAndThrowException($length)
     {
         $data = @stream_get_contents($this->_socket, $length);

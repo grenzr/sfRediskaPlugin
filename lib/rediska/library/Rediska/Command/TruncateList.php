@@ -4,31 +4,27 @@
  * Trim the list at key to the specified range of elements
  * 
  * @throws Rediska_Command_Exception
- * @param string $name Key name
+ * @param string  $name  Key name
  * @param integer $start Start index
- * @param integer $end End index
+ * @param integer $end   End index
  * @return boolean
  * 
  * @author Ivan Shumkov
  * @package Rediska
- * @version @package_version@
+ * @version 0.4.2
  * @link http://rediska.geometria-lab.net
  * @licence http://www.opensource.org/licenses/bsd-license.php
  */
 class Rediska_Command_TruncateList extends Rediska_Command_Abstract
 {
-    protected function _create($name, $limit, $offset = 0)
+    protected function _create($name, $start, $end)
     {
-        if (!is_integer($limit)) {
-            throw new Rediska_Command_Exception("Limit must be integer");
+        if (!is_integer($start)) {
+            throw new Rediska_Command_Exception("Start must be integer");
         }
-
-        if (!is_integer($offset)) {
-            throw new Rediska_Command_Exception("Offset must be integer");
+        if (!is_integer($end)) {
+            throw new Rediska_Command_Exception("End must be integer");
         }
-
-        $start = $offset;
-        $end   = $offset + $limit - 1;
 
         $connection = $this->_rediska->getConnectionByKeyName($name);
 
@@ -37,8 +33,8 @@ class Rediska_Command_TruncateList extends Rediska_Command_Abstract
         $this->_addCommandByConnection($connection, $command);
     }
 
-    protected function _parseResponse($response)
+    protected function _parseResponses($responses)
     {
-        return (boolean)$response[0];
+        return (boolean)$responses[0];
     }
 }

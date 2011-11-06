@@ -8,7 +8,7 @@
  * 
  * @author Ivan Shumkov
  * @package Rediska
- * @version @package_version@
+ * @version 0.4.2
  * @link http://rediska.geometria-lab.net
  * @licence http://www.opensource.org/licenses/bsd-license.php
  */
@@ -23,9 +23,9 @@ class Rediska_Command_GetLifetime extends Rediska_Command_Abstract
         $this->_addCommandByConnection($connection, $command);
     }
 
-    protected function _parseResponse($response)
+    protected function _parseResponses($responses)
     {
-        $reply = $response[0];
+        $reply = $responses[0];
 
         if ($reply == -1) {
             $reply = null;

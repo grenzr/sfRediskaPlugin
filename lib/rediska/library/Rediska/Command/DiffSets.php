@@ -3,7 +3,7 @@
 /**
  * @see Rediska_Command_CompareSets
  */
-require_once 'Rediska/Command/CompareSets.php';
+require_once(dirname(__FILE__).'/CompareSets.php');
 
 /**
  * Return the difference between the Set stored at key1 and all the Sets key2, ..., keyN
@@ -14,7 +14,7 @@ require_once 'Rediska/Command/CompareSets.php';
  * 
  * @author Ivan Shumkov
  * @package Rediska
- * @version @package_version@
+ * @version 0.4.2
  * @link http://rediska.geometria-lab.net
  * @licence http://www.opensource.org/licenses/bsd-license.php
  */
@@ -23,8 +23,8 @@ class Rediska_Command_DiffSets extends Rediska_Command_CompareSets
 	protected $_command = 'SDIFF';
     protected $_storeCommand = 'SDIFFSTORE';
 
-    protected function _prepareValues($response)
+    protected function _compareSets($sets)
     {
-        return call_user_func_array('array_diff', $response);
+        return call_user_func_array('array_diff', $sets);
     }
 }

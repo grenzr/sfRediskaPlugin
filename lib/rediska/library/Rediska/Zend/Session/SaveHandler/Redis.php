@@ -35,7 +35,7 @@ require_once 'Zend/Session/SaveHandler/Exception.php';
  * 
  * @author Ivan Shumkov
  * @package Rediska
- * @version @package_version@
+ * @version 0.4.2
  * @link http://rediska.geometria-lab.net
  * @licence http://www.opensource.org/licenses/bsd-license.php
  */
@@ -182,17 +182,20 @@ class Rediska_Zend_Session_SaveHandler_Redis implements Zend_Session_SaveHandler
     public function gc($maxlifetime)
     {
     	$sessions = $this->_set->toArray();
-    	foreach($sessions as &$session) {
-    		$session = $this->_getKeyName($session);
-    	}
 
-    	// TODO: May by use TTL? Need benchmark.
-    	$lifeSession = $this->_rediska->get($sessions);
-    	foreach($sessions as $session) {
-    		if (!isset($lifeSession[$session])) {
-    			$sessionWithoutPrefix = substr($session, strlen($this->_options['keyprefix']));
-    			$this->_set->remove($sessionWithoutPrefix);
-    		}
+    	if (!empty($sessions)) {
+        	foreach($sessions as &$session) {
+        		$session = $this->_getKeyName($session);
+        	}
+    
+        	// TODO: May by use TTL? Need benchmark.
+        	$lifeSession = $this->_rediska->get($sessions);
+        	foreach($sessions as $session) {
+        		if (!isset($lifeSession[$session])) {
+        			$sessionWithoutPrefix = substr($session, strlen($this->_options['keyprefix']));
+        			$this->_set->remove($sessionWithoutPrefix);
+        		}
+        	}
     	}
 
     	return true;
