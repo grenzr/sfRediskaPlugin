@@ -3,17 +3,17 @@
 /**
  * @see Rediska_Connection
  */
-require_once 'Rediska/Connection.php';
+require_once(dirname(__FILE__).'/../Connection.php');
 
 /**
  * @see Rediska_KeyDistributor_Interface
  */
-require_once 'Rediska/KeyDistributor/Interface.php';
+require_once(dirname(__FILE__).'/Interface.php');
 
 /**
  * @see Rediska_KeyDistributor_Exception
  */
-require_once 'Rediska/KeyDistributor/Exception.php';
+require_once(dirname(__FILE__).'/Exception.php');
 
 /**
  * @package Rediska

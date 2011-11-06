@@ -8,7 +8,7 @@
  * 
  * @author Ivan Shumkov
  * @package Rediska
- * @version @package_version@
+ * @version 0.4.2
  * @link http://rediska.geometria-lab.net
  * @licence http://www.opensource.org/licenses/bsd-license.php
  */
@@ -54,11 +54,11 @@ class Rediska_Command_Delete extends Rediska_Command_Abstract
         }
     }
 
-    protected function _parseResponse($response)
+    protected function _parseResponses($responses)
     {
         $count = 0;
-        foreach($response as $result) {
-            $count += $result;
+        foreach($responses as $response) {
+            $count += $response;
         }
         return $count;
     }

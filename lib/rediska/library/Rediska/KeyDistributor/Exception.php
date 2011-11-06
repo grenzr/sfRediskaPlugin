@@ -3,14 +3,14 @@
 /**
  * @see Rediska_Exception
  */
-require_once 'Rediska/Exception.php';
+require_once(dirname(__FILE__).'/../Exception.php');
 
 /**
  * Rediska key distributor exception
  * 
  * @author Ivan Shumkov
  * @package Rediska
- * @version @package_version@
+ * @version 0.4.2
  * @link http://rediska.geometria-lab.net
  * @licence http://www.opensource.org/licenses/bsd-license.php
  */

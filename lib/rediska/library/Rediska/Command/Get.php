@@ -8,12 +8,12 @@
  * 
  * @author Ivan Shumkov
  * @package Rediska
- * @version @package_version@
+ * @version 0.4.2
  * @link http://rediska.geometria-lab.net
  * @licence http://www.opensource.org/licenses/bsd-license.php
  */
 class Rediska_Command_Get extends Rediska_Command_Abstract
-{
+{ 
     protected $_multi = false;
     protected $_keys = array();
     protected $_keysByConnections = array();
@@ -63,18 +63,18 @@ class Rediska_Command_Get extends Rediska_Command_Abstract
         }
     }
 
-    protected function _parseResponse($response)
+    protected function _parseResponses($responses)
     {
         if ($this->_multi) {
             $result = array();
-            if (!empty($response)) {
-                $responses = array();
-                foreach($response as $responseByConnection) {
-                    $responses = array_merge($responses, $responseByConnection);
+            if (!empty($responses)) {
+                $mergedResponses = array();
+                foreach($responses as $response) {
+                    $mergedResponses = array_merge($mergedResponses, $response);
                 }
                 $unsortedResult = array();
                 foreach($this->_keysByConnections as $i => $key) {
-                    $unsortedResult[$key] = $responses[$i];
+                    $unsortedResult[$key] = $mergedResponses[$i];
                 }
                 foreach($this->_keys as $key) {
                     if (isset($unsortedResult[$key])) {
@@ -85,7 +85,7 @@ class Rediska_Command_Get extends Rediska_Command_Abstract
 
             return $result;
         } else {
-            return $this->_rediska->unserialize($response[0]);
+            return $this->_rediska->unserialize($responses[0]);
         }
     }
 }

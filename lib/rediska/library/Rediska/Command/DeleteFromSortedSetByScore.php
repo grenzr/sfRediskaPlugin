@@ -10,12 +10,14 @@
  * 
  * @author Ivan Shumkov
  * @package Rediska
- * @version @package_version@
+ * @version 0.4.2
  * @link http://rediska.geometria-lab.net
  * @licence http://www.opensource.org/licenses/bsd-license.php
  */
 class Rediska_Command_DeleteFromSortedSetByScore extends Rediska_Command_Abstract
 {
+    protected $_version = '1.1';
+
     protected function _create($name, $min, $max)
     {
         $connection = $this->_rediska->getConnectionByKeyName($name);
@@ -25,8 +27,8 @@ class Rediska_Command_DeleteFromSortedSetByScore extends Rediska_Command_Abstrac
         $this->_addCommandByConnection($connection, $command);
     }
 
-    protected function _parseResponse($response)
+    protected function _parseResponses($responses)
     {
-        return $response[0];
+        return $responses[0];
     }
 }

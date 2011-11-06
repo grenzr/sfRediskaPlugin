@@ -1,0 +1,7 @@
+all:
+  sfRediska:
+    app:
+      servers:
+        server_01:
+          host: 127.0.0.1
+          persistent: true

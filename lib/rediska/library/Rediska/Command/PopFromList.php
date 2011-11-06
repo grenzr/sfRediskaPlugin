@@ -9,7 +9,7 @@
  * 
  * @author Ivan Shumkov
  * @package Rediska
- * @version @package_version@
+ * @version 0.4.2
  * @link http://rediska.geometria-lab.net
  * @licence http://www.opensource.org/licenses/bsd-license.php
  */
@@ -25,6 +25,8 @@ class Rediska_Command_PopFromList extends Rediska_Command_Abstract
             $toConnection = $this->_rediska->getConnectionByKeyName($pushToName);
 
             if ($connection->getAlias() == $toConnection->getAlias()) {
+                $this->_checkVersion('1.1');
+
             	$command = array('RPOPLPUSH',
             	                 "{$this->_rediska->getOption('namespace')}$name",
             	                 "{$this->_rediska->getOption('namespace')}$pushToName");
@@ -38,14 +40,14 @@ class Rediska_Command_PopFromList extends Rediska_Command_Abstract
         $this->_addCommandByConnection($connection, $command);
     }
 
-    protected function _parseResponse($response)
+    protected function _parseResponses($responses)
     {
         if (!$this->isAtomic()) {
-            $value = $this->_rediska->unserialize($response[0]);
+            $value = $this->_rediska->unserialize($responses[0]);
 
             return $this->_rediska->prependToList($this->pushToName, $value);
         } else {
-            return $this->_rediska->unserialize($response[0]);
+            return $this->_rediska->unserialize($responses[0]);
         }
     }
 }

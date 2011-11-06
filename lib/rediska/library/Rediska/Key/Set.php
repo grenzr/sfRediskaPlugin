@@ -3,14 +3,14 @@
 /**
  * @see Rediska_Key_Abstract
  */
-require_once 'Rediska/Key/Abstract.php';
+require_once(dirname(__FILE__).'/Abstract.php');
 
 /**
  * Rediska Set key
  * 
  * @author Ivan Shumkov
  * @package Rediska
- * @version @package_version@
+ * @version 0.4.2
  * @link http://rediska.geometria-lab.net
  * @licence http://www.opensource.org/licenses/bsd-license.php
  */
@@ -96,19 +96,7 @@ class Rediska_Key_Set extends Rediska_Key_Abstract implements IteratorAggregate,
      */
     public function intersect($setOrSets, $storeKeyName = null)
     {
-    	if (!is_array($setOrSets)) {
-    		$sets = array($setOrSets);
-    	} else {
-    		$sets = $setOrSets;
-    	}
-    	
-    	array_unshift($sets, $this->_name);
-
-    	foreach($sets as &$set) {
-	    	if ($set instanceof Rediska_Key_Set) {
-	            $set = $set->getName();
-	        }
-    	}
+    	$sets = $this->_prepareSetsForCompare($setOrSets);
     	
     	return $this->_getRediskaOn()->intersectSets($sets, $storeKeyName);
     }
@@ -122,19 +110,7 @@ class Rediska_Key_Set extends Rediska_Key_Abstract implements IteratorAggregate,
      */
     public function union($setOrSets, $storeKeyName = null)
     {
-        if (!is_array($setOrSets)) {
-            $sets = array($setOrSets);
-        } else {
-            $sets = $setOrSets;
-        }
-    	
-    	array_unshift($sets, $this->_name);
-
-        foreach($sets as &$set) {
-            if ($set instanceof Rediska_Key_Set) {
-                $set = $set->getName();
-            }
-        }
+        $sets = $this->_prepareSetsForCompare($setOrSets);
 
         return $this->_getRediskaOn()->unionSets($sets, $storeKeyName);
     }
@@ -148,29 +124,30 @@ class Rediska_Key_Set extends Rediska_Key_Abstract implements IteratorAggregate,
      */
     public function diff($setOrSets, $storeKeyName = null)
     {
-        if (!is_array($setOrSets)) {
-            $sets = array($setOrSets);
-        } else {
-            $sets = $setOrSets;
-        }
-    	
-    	array_unshift($sets, $this->_name);
-
-        foreach($sets as &$set) {
-            if ($set instanceof Rediska_Key_Set) {
-                $set = $set->getName();
-            }
-        }
+        $sets = $this->_prepareSetsForCompare($setOrSets);
 
         return $this->_getRediskaOn()->diffSets($sets, $storeKeyName);
     }
 
     /**
+     * Get sorted the elements
+     * 
+     * @param string|array  $value Options or SORT query string (http://code.google.com/p/redis/wiki/SortCommand).
+     *                             Important notes for SORT query string:
+     *                                 1. If you set Rediska namespace option don't forget add it to key names.
+     *                                 2. If you use more then one connection to Redis servers, it will choose by key name,
+     *                                    and key by you pattern's may not present on it.
+     * @return array
+     */
+    public function sort($options = array())
+    {
+        return $this->_getRediskaOn()->sort($this->_name, $options);
+    }
+
+    /**
      * Get Set values
      * 
-     * @see Rediska#getSet
-     * @param string $sort Sorting query see: http://code.google.com/p/redis/wiki/SortCommand
-     *                     ALPHA work incorrect becouse values in Set serailized
+     * @param string $sort Deprecated
      * @return array
      */
     public function toArray($sort = null)
@@ -233,5 +210,26 @@ class Rediska_Key_Set extends Rediska_Key_Abstract implements IteratorAggregate,
     public function offsetGet($value)
     {
         throw new Rediska_Key_Exception('Offset is not allowed in sets');
+    }
+    
+    protected function _prepareSetsForCompare($setOrSets)
+    {
+        if (!is_array($setOrSets)) {
+            $sets = array($setOrSets);
+        } else {
+            $sets = $setOrSets;
+        }
+
+        foreach($sets as &$set) {
+            if ($set instanceof Rediska_Key_Set) {
+                $set = $set->getName();
+            }
+        }
+
+        if (!in_array($this->_name, $sets)) {
+            array_unshift($sets, $this->_name);
+        }
+
+        return $sets;
     }
 }

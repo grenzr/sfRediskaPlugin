@@ -3,14 +3,14 @@
 /**
  * @see Rediska_Key_Abstract
  */
-require_once 'Rediska/Key/Abstract.php';
+require_once(dirname(__FILE__).'/Key/Abstract.php');
 
 /**
  * Rediska basic key
  * 
  * @author Ivan Shumkov
  * @package Rediska
- * @version @package_version@
+ * @version 0.4.2
  * @link http://rediska.geometria-lab.net
  * @licence http://www.opensource.org/licenses/bsd-license.php
  */
@@ -84,7 +84,7 @@ class Rediska_Key extends Rediska_Key_Abstract
  * 
  * @author Ivan Shumkov
  * @package Rediska
- * @version @package_version@
+ * @version 0.4.2
  * @link http://rediska.geometria-lab.net
  * @licence http://www.opensource.org/licenses/bsd-license.php
  */
