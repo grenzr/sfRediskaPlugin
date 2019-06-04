@@ -139,14 +139,14 @@ class Rediska_KeyDistributor_ConsistentHashing implements Rediska_KeyDistributor
                     // If $count = 1, no more checks are necessary.
                     if ($count === 1) {
                         $return = array($backend);
-                        break 2;
+                        break;
                     } elseif (!in_array($backend, $return)) {
                         $return[] = $backend;
-                        if (count($return) >= $count) break 2;
+                        if (count($return) >= $count) break;
                     }
 
                     $return = array($backend);
-                    break 1;
+                    break;
                 }
             }
 
@@ -157,7 +157,7 @@ class Rediska_KeyDistributor_ConsistentHashing implements Rediska_KeyDistributor
             if ($slice >= $this->_slicesCount) {
                 // If already looped once, something is wrong.
                 if ($looped) {
-                    break 2;
+                    break;
                 }
 
                 // Otherwise, loop back to the beginning.       
