@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Rediska cache driver
  *
@@ -33,7 +34,7 @@ class Doctrine_Cache_Redis extends Doctrine_Cache_Driver
         	}
         } else {
 			$instance = $this->getOption('instance','default');
-	        $this->_rediska = sfRediska::getInstance($instance);
+	        $this->_rediska = new sfRediskaCache(['instance' => 'app']);
         }
     }
 
@@ -70,12 +71,7 @@ class Doctrine_Cache_Redis extends Doctrine_Cache_Driver
      */
     protected function _doSave($id, $data, $lifeTime = false)
     {
-    	$pipeline = $this->_rediska->pipeline();
-    	$pipeline->set($id, $data);
-    	if ($lifeTime) {
-			$pipeline->expire($id, $lifeTime);
-    	}
-        return $pipeline->execute();
+        return $this->_rediska->set($id, $data, $lifeTime);
     }
 
     /**
@@ -97,6 +93,6 @@ class Doctrine_Cache_Redis extends Doctrine_Cache_Driver
      */
     protected function _getCacheKeys()
     {
-        return $this->_rediska->getKeysByPattern('*');
+        return $this->_rediska->getMany(['*']);
     }
 }
