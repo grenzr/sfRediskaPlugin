@@ -46,6 +46,8 @@ class Doctrine_Cache_Redis extends Doctrine_Cache_Driver
      */
     protected function _doFetch($id, $testCacheValidity = true)
     {
+        $id = $this->prepareId($id);
+
         return ($get = $this->_rediska->get($id)) ? $get : false;
     }
 
@@ -57,6 +59,8 @@ class Doctrine_Cache_Redis extends Doctrine_Cache_Driver
      */
     protected function _doContains($id)
     {
+        $id = $this->prepareId($id);
+
         return $this->_rediska->exists($id);
     }
 
@@ -71,6 +75,8 @@ class Doctrine_Cache_Redis extends Doctrine_Cache_Driver
      */
     protected function _doSave($id, $data, $lifeTime = false)
     {
+        $id = $this->prepareId($id);
+
         return $this->_rediska->set($id, $data, $lifeTime);
     }
 
@@ -83,7 +89,7 @@ class Doctrine_Cache_Redis extends Doctrine_Cache_Driver
      */
     protected function _doDelete($id)
     {
-        return $this->_rediska->delete($id);
+        return $this->_rediska->remove($id);
     }
 
     /**
@@ -94,5 +100,18 @@ class Doctrine_Cache_Redis extends Doctrine_Cache_Driver
     protected function _getCacheKeys()
     {
         return $this->_rediska->getMany(['*']);
+    }
+
+    /**
+     *
+     * Remove forbidden characters of the key
+     *
+     * @param $id
+     *
+     * @return string|string[]|null
+     */
+    private function prepareId($id)
+    {
+        return preg_replace('#[\s+:]#', '_', $id);
     }
 }
