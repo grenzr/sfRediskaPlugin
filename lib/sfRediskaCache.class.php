@@ -99,8 +99,10 @@ class sfRediskaCache extends sfCache
 	public function clean($mode = sfCache::ALL)
 	{
 		if (sfCache::ALL === $mode) {
-			$this->_rediska->flushDb();
+			return $this->_rediska->flushDb();
 		}
+
+		return false;
 	}
 
 	public function getMany($keys)
