@@ -116,7 +116,7 @@ class sfRediskaCache extends sfCache
         $keysList = $this->_rediska->getKeysByPattern($keys);
 
         foreach ($keysList as $index => $key) {
-            $keysList[$index] = str_replace($this->getOption('prefix'), "", $key);
+            $keysList[$index] = preg_replace("/^{$this->getOption('prefix')}/", "", $key);
         }
 
         return $keysList;
