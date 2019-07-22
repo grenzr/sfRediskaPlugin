@@ -107,8 +107,19 @@ class sfRediskaCache extends sfCache
 
 	public function getMany($keys)
 	{
-		$keys = array_map(array($this, 'getKey'), $keys);
-		return $this->_rediska->get($keys);
+        $keys = array_map(array($this, 'getKey'), $keys);
+
+        if (is_array($keys) && count($keys) == 1) {
+            $keys = $keys[0];
+        }
+
+        $keysList = $this->_rediska->getKeysByPattern($keys);
+
+        foreach ($keysList as $index => $key) {
+            $keysList[$index] = str_replace($this->getOption('prefix'), "", $key);
+        }
+
+        return $keysList;
 	}
 
 	/**

@@ -99,7 +99,13 @@ class Doctrine_Cache_Redis extends Doctrine_Cache_Driver
      */
     protected function _getCacheKeys()
     {
-        return $this->_rediska->getMany(['*']);
+        $cacheKeys = $this->_rediska->getMany(['*']);
+
+        foreach ($cacheKeys as $index => $key) {
+            $cacheKeys[$index] = preg_replace("/^{$this->getOption('prefix')}/", "", $key);
+        }
+
+        return $cacheKeys;
     }
 
     /**
