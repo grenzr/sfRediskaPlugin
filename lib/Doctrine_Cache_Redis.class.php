@@ -52,6 +52,16 @@ class Doctrine_Cache_Redis extends Doctrine_Cache_Driver
     }
 
     /**
+     * @param string $pattern
+     *
+     * @return int
+     */
+    public function deleteByPattern(string $pattern): int
+    {
+        return $this->_rediska->removePattern($pattern);
+    }
+
+    /**
      * Test if a cache is available or not (for the given id)
      *
      * @param string $id cache id

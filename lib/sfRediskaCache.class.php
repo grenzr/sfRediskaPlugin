@@ -151,17 +151,25 @@ class sfRediskaCache extends sfCache
 	 * We manually remove keys as the redis glob style * == sfCache ** style
 	 *
 	 * @see sfCache
+     *
+     * @return int
 	 */
 	public function removePattern($pattern)
 	{
 		$pattern = $this->getKey($pattern);
-		$regexp = self::patternToRegexp($pattern);
-		$keys = $this->_rediska->getKeysByPattern($pattern);
+        $regexp = self::patternToRegexp($pattern);
+        $keys = $this->_rediska->getKeysByPattern($pattern);
+        $nbKeysDeleted = 0;
+
 		foreach ($keys as $key) {
 			if (preg_match($regexp, $key)) {
-				$this->remove(substr($key, strlen($this->getOption('prefix'))));
+				if ($this->remove(substr($key, strlen($this->getOption('prefix'))))) {
+				    $nbKeysDeleted++;
+                }
 			}
 		}
+
+		return $nbKeysDeleted;
 	}
 
 	/*
